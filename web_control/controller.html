@@ -400,9 +400,9 @@
 				//------ Define your variables here
 				var ws;
 				if("WebSocket" in window) {
-					// var host = window.location.host;
+					var host = window.location.host;
 					// alert(host)
-					var host = "blimp.local:8888"
+					// var host = "blimp.local:8888"
 					ws = new WebSocket("ws://" + host + "/control_signal");
 					// alert(ws.readyState)
 					function check_ws() {
@@ -412,7 +412,7 @@
 							alert('Connection failed')
 						}
 					}
-					window.setTimeout(check_ws,1000);
+					// window.setTimeout(check_ws,1000);
 				} else {
 					alert('WebSocket NOT supported')
 				}

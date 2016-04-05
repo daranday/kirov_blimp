@@ -1,5 +1,5 @@
 #raspivid -t 999999 -w 1280 -h 720 -fps 20 -o - | nc 192.168.0.102 5001 
-target='192.168.0.102'
+target='Hal.local'
 echo ''
 while true; do 
     nc -v -z -w 3 $target 5001 2&> /dev/null 2&> /dev/null

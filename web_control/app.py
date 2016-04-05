@@ -25,7 +25,7 @@ class WebSocketChatHandler(tornado.websocket.WebSocketHandler):
     for client in clients:
         client.write_message(message)
     message = json.loads(message)
-    print message
+    # print message
     rpi.setServoAngle(90 + 90 * message['left']['horizontal'])
     rpi.setMotorThrottle(50 * message['right'])
         
