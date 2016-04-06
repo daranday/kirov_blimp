@@ -12,8 +12,8 @@ from Tkinter import *
 
 # Initialise the PWM device using the default address
 pwm = PWM(0x40)
-channels = [0, 1, 2]
-motorChannels = [4, 5]
+servoChannels = [0, 3]
+motorChannels = [6, 9]
 # Note if you'd like more debug output you can instead run:
 #pwm = PWM(0x40, debug=True)
 
@@ -26,20 +26,21 @@ servoMax = 2.6 # ms high time for 180 degrees
 motorMin = 1.0 # ms
 motorMax = 2.0 # ms
 
-def setServoAngle(angle):
+def setServoAngle(angle, servoIndex):
   # print 'Changing servo angles'
   angle = float(angle)
   if angle < 0 or angle > 180:
     raise Exception("Angle out of bounds.")
 
   highTick = int((angle / 180.0 * (servoMax - servoMin) + servoMin) / (1.0 / frequency * 1000) * 4096)
-  for channel in channels:
+  # for channel in servoChannels:
     # print highTick
-    pwm.setPWM(channel, 0, highTick)
+  pwm.setPWM(servoChannels[servoIndex], 0, highTick)
 
 def setMotorThrottle(percentage):
   # print 'Changing motor throttles'
-  percentage = float(percentage)
+  weakenScale = 0.5
+  percentage = weakenScale * float(percentage)
   highTick = int((percentage / 60.0 * (motorMax - motorMin) + motorMin) / (1.0 / frequency * 1000) * 4095)
   for channel in motorChannels:
     # print highTick
