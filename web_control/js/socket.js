@@ -2,11 +2,11 @@ function init_socket() {
 	//------ Define your variables here
 	var ws;
 	if("WebSocket" in window) {
+		var intervalId = -1;
 		var host = window.location.host;
 		// alert(host)
 		// var host = "blimp.local:8888"
-		ws = new WebSocket("ws://" + host + "/control_signal");
-		
+		ws = new ReconnectingWebSocket("ws://" + host + "/control_signal");
 
 		function check_ws() {
 			if (ws.readyState === 1) {
@@ -44,15 +44,17 @@ function init_socket() {
 	{
 		if (window.controller == 'Ready') {
 			window.controller = 'NotReady';
-			var data = { l : { y : Number((leftStickY * 1.0 / leftRange).toFixed(1)), 
+			var data = { l : { y : Number(((leftStickY - leftStickOriginY) * 1.0 / leftRange).toFixed(1)), 
 								x : Number(((leftStickX - leftStickOriginX) * 1.0 / leftRange).toFixed(1))}, 
-								r: Number(((rightStickY * 1.0 / rightRange + 1) / 2).toFixed(1)) }
+						 r : Number(((rightStickY * 1.0 / rightRange + 1) / 2).toFixed(1)) }
 			try {
 				ws.send(JSON.stringify(data));
 			} 
-			catch(err){}
+			catch(err){
+				
+			}
 			window.controller = 'Ready'
-		}		    
+		}
 	}
 }
 

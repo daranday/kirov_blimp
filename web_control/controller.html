@@ -14,11 +14,15 @@
 		</style>
 	</head>
 	<body>
-		<img id="stream_window" alt="" src="http://192.168.0.100:8080/?action=stream" />
+		<img id="stream_window" alt="" src="" />
 		<script src="js/jquery-2.0.3.min.js" language="javascript"></script>
+		<script src="js/reconnecting-websocket.min.js" language="javascript"></script>
 		<script src="js/three.min.js"></script>
 		<script src="js/socket.js" language="javascript"></script>
 		<script src="js/render_control.js"></script>
+		<script type="text/javascript">
+			$('#stream_window').attr('src', 'http://' + window.location.hostname + ':8080/?action=stream')
+		</script>
 	</body>
 </html>
 
