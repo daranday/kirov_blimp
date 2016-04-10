@@ -5,7 +5,6 @@ window.onload=function(){
 	});
 }
 
-
 var container, stats;
 
 var camera, scene, renderer;
@@ -25,16 +24,23 @@ var rightStickRadius = 70;
 var leftRange = leftStickLength/2 - leftStickRadius;
 var rightRange = rightStickHeight/2 - rightStickRadius - 10;
 
-var leftStickOriginX = -300;
+// alert(window.innerHeight)
+// alert(window.innerWidth)
+
+var scaleFactor = window.innerWidth/window.innerHeight*833/1619
+
+// alert(scaleFactor)
+
+var leftStickOriginX = -340*scaleFactor;
 var leftStickOriginY = 0;
-var rightStickOriginX = 300;
+var rightStickOriginX = 340*scaleFactor;
 var rightStickOriginY = 0;
 
 var leftStickX = leftStickOriginX;
 var leftStickY = leftStickOriginY;
 var rightStickY = rightStickOriginY - rightRange;
 
-var movingObject = null;
+var movingObject = [false, false];
 
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
@@ -42,6 +48,7 @@ var windowHalfY = window.innerHeight / 2;
 
 window.onload=function(){
 	init();
+	onWindowResize();
 	animate();
 }
 
@@ -229,6 +236,17 @@ function onWindowResize() {
 	camera.updateProjectionMatrix();
 
 	renderer.setSize( window.innerWidth, window.innerHeight );
+
+	var secondScale = Math.min(scaleFactor / 1.0318, 279.0/(275.0/4*3));
+
+	var img_width  = secondScale * 275.0 * window.innerHeight / 279.0,
+		img_height = secondScale * 275.0/4*3 * window.innerHeight / 279.0;
+	var all_width = img_width * 25.5 / 13.5
+
+	$('#stream_window').height(img_height);
+	$('#stream_window').width(img_width);
+	$('#stream_window').css("margin-top", -img_height/2+"px");
+	$('#stream_window').css("margin-left", -img_width/2+"px");
 }
 
 function startTracking(event_x, event_y) {
@@ -253,9 +271,9 @@ function startTracking(event_x, event_y) {
 		return;
 	} else {
 		if (intersects[0].point.x < 0) {
-			movingObject = "left";
+			movingObject[0] = true;
 		} else {
-			movingObject = "right";
+			movingObject[1] = true;
 		}
 	}
 }
@@ -275,31 +293,33 @@ function onDocumentMouseDown( event ) {
 }
 
 function changePosition(pos) {
-	if (movingObject == "left") {
-		leftStickX = pos.x;
-		leftStickY = pos.y;
+	if (pos.x < 0) {
+		if (movingObject[0] == true) {
+			leftStickX = pos.x;
+			leftStickY = pos.y;
 
-		if (leftStickX > leftStickOriginX + leftRange)
-			leftStickX = leftStickOriginX + leftRange;
+			if (leftStickX > leftStickOriginX + leftRange)
+				leftStickX = leftStickOriginX + leftRange;
 
-		if (leftStickY > leftStickOriginY + leftRange)
-			leftStickY = leftStickOriginY + leftRange;
+			if (leftStickY > leftStickOriginY + leftRange)
+				leftStickY = leftStickOriginY + leftRange;
 
-		if (leftStickX < leftStickOriginX - leftRange)
-			leftStickX = leftStickOriginX - leftRange;
+			if (leftStickX < leftStickOriginX - leftRange)
+				leftStickX = leftStickOriginX - leftRange;
 
-		if (leftStickY < leftStickOriginY - leftRange)
-			leftStickY = leftStickOriginY - leftRange;
+			if (leftStickY < leftStickOriginY - leftRange)
+				leftStickY = leftStickOriginY - leftRange;
+		}
+	} else {
+		if (movingObject[1] == true) {
+			rightStickY = pos.y;
 
+			if (rightStickY > rightStickOriginY + rightRange)
+				rightStickY = rightStickOriginY + rightRange;
 
-	} else if (movingObject == "right") {
-		rightStickY = pos.y;
-
-		if (rightStickY > rightStickOriginY + rightRange)
-			rightStickY = rightStickOriginY + rightRange;
-
-		if (rightStickY < rightStickOriginY - rightRange)
-			rightStickY = rightStickOriginY - rightRange;
+			if (rightStickY < rightStickOriginY - rightRange)
+				rightStickY = rightStickOriginY - rightRange;
+		}
 	}
 }
 
@@ -318,7 +338,7 @@ function onDocumentMouseUp( event ) {
 
 	leftStickX = leftStickOriginX;
 	leftStickY = leftStickOriginY;
-	movingObject = null;
+	movingObject[0] = false;
 }
 
 function onDocumentMouseOut( event ) {
@@ -329,42 +349,45 @@ function onDocumentMouseOut( event ) {
 
 	leftStickX = leftStickOriginX;
 	leftStickY = leftStickOriginY;
-	movingObject = null;
+	movingObject[1] = false;
 }
 
 function onDocumentTouchStart( event ) {
+	event.preventDefault();
 
-	if ( event.touches.length == 1 ) {
-
-		event.preventDefault();
-
-		startTracking(event.touches[ 0 ].pageX * 4, event.touches[ 0 ].pageY * 4)
-
+	for (var i = 0; i < event.touches.length; ++i) {
+		startTracking(event.touches[ i ].pageX * 4, event.touches[ i ].pageY * 4)
 	}
-
 }
 
 function onDocumentTouchMove( event ) {
+	event.preventDefault();
 
-	if ( event.touches.length == 1 ) {
-
-		event.preventDefault();
-
-		pos = to3D(event.touches[ 0 ].pageX, event.touches[ 0 ].pageY);
-
+	for (var i = 0; i < event.touches.length; ++i) {
+		pos = to3D(event.touches[ i ].pageX, event.touches[ i ].pageY);
 		changePosition(pos);
-		
 	}
-
 }
 
 function onDocumentTouchEnd( event ) {
 
 	event.preventDefault();
 
-	leftStickX = leftStickOriginX;
-	leftStickY = leftStickOriginY;
-	movingObject = null;
+	for (var i = 0; i < event.changedTouches.length; ++i) {
+		pos = to3D(event.changedTouches[ i ].pageX, event.changedTouches[ i ].pageY);
+
+		if (pos.x < 0 && movingObject[0]) {
+			leftStickX = leftStickOriginX;
+			leftStickY = leftStickOriginY;
+			movingObject[0] = false;
+		}
+
+		if (pos.x >= 0 && movingObject[1]) {
+			movingObject[1] = false;
+		}
+		changePosition(pos);
+	}
+
 
 }
 
